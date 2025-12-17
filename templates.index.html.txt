@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Create Warning</title>
+
+    <style>
+        body { font-family: Arial; background: #f5f5f5; padding: 40px; }
+        .container { width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        h2 { text-align: center; }
+        label { font-weight: bold; display:block; margin-top:10px; }
+        input, textarea { width:100%; padding:8px; margin-top:5px; border-radius: 4px; border:1px solid #ccc; }
+        textarea { height: 120px; }
+        .submit-btn { margin-top:20px; padding:12px; background:#1877f2; color:white; border:none; border-radius:6px; width:100%; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Create Warning</h2>
+
+    <form method="POST" action="/submit">
+
+        <label>Location:</label>
+        <input type="text" name="location" value="Bali Strait - Ketapang - Gilimanuk" required>
+
+        <label>Forecaster:</label>
+        <input type="text" name="forecaster" required>
+
+        <label>Initial time:</label>
+        <input type="datetime-local" name="initial_time" required>
+
+        <label>Valid until:</label>
+        <input type="datetime-local" name="valid_until" required>
+
+        <label>Naration:</label>
+        <textarea name="narration" required></textarea>
+
+        <button class="submit-btn">Submit and Publish</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
