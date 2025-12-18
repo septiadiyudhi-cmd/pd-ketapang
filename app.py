@@ -6,13 +6,35 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# pastikan folder ada
+# Pastikan folder ada
 os.makedirs("data", exist_ok=True)
 os.makedirs("data/generated_pages", exist_ok=True)
 
 DATABASE = "data/warnings.json"
 
-# buat file database jika belum ada
+# ===============================
+# TELEGRAM FUNCTION
+# ===============================
+def send_telegram_message(text):
+    token = os.environ.get("TELEGRAM_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+
+    if not token or not chat_id:
+        print("Telegram config missing")
+        return
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": False
+    }
+
+    requests.post(url, data=payload)
+
+
+# Buat file database jika belum ada
 if not os.path.exists(DATABASE):
     with open(DATABASE, "w") as f:
         json.dump([], f, indent=4)
@@ -38,7 +60,6 @@ def submit():
     narr = request.form.get("narration")
 
     # Buat ID warning
-    # Contoh: ktpgglmn_202512151930
     dt = datetime.now().strftime("%Y%m%d%H%M")
     warning_id = f"ktpgglmn_{dt}"
 
@@ -67,6 +88,23 @@ def submit():
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
+    # ===============================
+    # KIRIM TELEGRAM
+    # ===============================
+    warning_url = f"https://{request.host}/warning/{warning_id}"
+
+    telegram_msg = (
+        "<b>⚠️ EARLY WARNING SYSTEM</b>\n\n"
+        f"<b>Location:</b> {location}\n"
+        f"<b>Forecaster:</b> {forecaster}\n"
+        f"<b>Issued:</b> {initial_time}\n"
+        f"<b>Valid Until:</b> {valid_until}\n\n"
+        f"{narr}\n\n"
+        f"<b>Detail:</b>\n{warning_url}"
+    )
+
+    send_telegram_message(telegram_msg)
+
     # Redirect user ke halaman warning
     return redirect(f"/warning/{warning_id}")
 
@@ -85,4 +123,3 @@ def warning(wid):
 
 if __name__ == "__main__":
     app.run(debug=True)
-
